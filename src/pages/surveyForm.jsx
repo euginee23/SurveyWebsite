@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { validateForm } from '../validation/userInfoValidation';
 import { validateQuestions } from '../validation/questionValidation';
 import ScrollToError from '../components/scrollToError';
+import Swal from 'sweetalert2';
 import Question1 from './questions/question1';
 import Question2 from './questions/question2';
 import Question3 from './questions/question3';
@@ -37,6 +38,7 @@ const SurveyForm = () => {
   });
 
   const [formErrors, setFormErrors] = useState({});
+  const [loading, setLoading] = useState(false);
   const firstErrorRef = useRef();
 
   const handleInputChange = (event) => {
@@ -110,6 +112,7 @@ const SurveyForm = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setLoading(true);
 
     const userInfoErrors = await validateForm(formData);
     const questionErrors = validateQuestions(formData);
@@ -127,10 +130,35 @@ const SurveyForm = () => {
 
     if (Object.keys(errors).length > 0) {
       scrollToError();
+      setLoading(false);
       return;
     }
 
     try {
+      // Check if the email is already in use
+      const emailCheckResponse = await fetch('http://localhost:5000/api/checkEmail', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: formData.email }),
+      });
+  
+      const emailCheckData = await emailCheckResponse.json();
+  
+      if (emailCheckData.emailInUse) {
+        // Email is already in use, show SweetAlert2 alert
+        await Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'This email is already in use. Please use a different email.',
+        });
+  
+        setLoading(false);
+        return;
+      }
+  
+      // Continue with the form submission if email is not in use
       const response = await fetch('http://localhost:5000/api/submitForm', {
         method: 'POST',
         headers: {
@@ -138,11 +166,11 @@ const SurveyForm = () => {
         },
         body: JSON.stringify(formData),
       });
-
+  
       const data = await response.json();
-
+  
       console.log('Server response:', data);
-
+  
       if (data.success) {
         console.log('Form submitted successfully!');
         navigate('/success');
@@ -151,6 +179,8 @@ const SurveyForm = () => {
       }
     } catch (error) {
       console.error('Error submitting form:', error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -329,8 +359,8 @@ const SurveyForm = () => {
             </div>
           </div>
 
-          <button type="submit" className="btn btn-success btn-lg mb-4 mt-1" style={{ margin: '20px' }}>
-            Submit
+          <button type="submit" className="btn btn-success btn-lg mb-4 mt-1" style={{ margin: '20px' }} disabled={loading}>
+            {loading ? 'Submitting...' : 'Submit'}
           </button>
 
         </form>

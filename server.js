@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const db = require('./db');
+const nodemailer = require('nodemailer');
 const app = express();
 
 const PORT = process.env.PORT || 5000;
@@ -8,6 +9,15 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(cors());
 
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'molaveengineering@gmail.com',
+    pass: 'cddz kzfq fbqm pcov',
+  },
+});
+
+// FORM SUBMISSION
 app.post('/api/submitForm', async (req, res) => {
   try {
     const {
@@ -36,6 +46,16 @@ app.post('/api/submitForm', async (req, res) => {
     await connection.beginTransaction();
 
     try {
+      const [existingUser] = await connection.query('SELECT * FROM users WHERE email = ?', [email]);
+
+      if (existingUser.length > 0) {
+        await connection.rollback();
+        connection.release();
+
+        res.status(400).json({ success: false, message: 'Email is already in use' });
+        return;
+      }
+
       const [userData] = await connection.query(
         'INSERT INTO users (firstName, lastName, position, course, email) VALUES (?, ?, ?, ?, ?)',
         [firstName, lastName, position, course, email]
@@ -92,6 +112,7 @@ app.post('/api/submitForm', async (req, res) => {
 
       await connection.commit();
       connection.release();
+      sendThankYouEmail(email);
 
       res.status(200).json({ success: true, message: 'Form submitted successfully!' });
     } catch (error) {
@@ -108,6 +129,45 @@ app.post('/api/submitForm', async (req, res) => {
     res.status(500).json({ success: false, message: 'Internal Server Error', error: error.message });
   }
 });
+
+// CHECK EMAIL
+app.post('/api/checkEmail', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const [existingUser] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+
+    if (existingUser.length > 0) {
+      res.json({ emailInUse: true });
+    } else {
+      res.json({ emailInUse: false });
+    }
+  } catch (error) {
+    console.error('Error checking email:', error.message);
+    res.status(500).json({ success: false, message: 'Internal Server Error', error: error.message });
+  }
+});
+
+// EMAIL STRUCTURE
+async function sendThankYouEmail(email) {
+  try {
+    const mailOptions = {
+      from: 'molaveengineering@gmail.com',
+      to: email,
+      subject: 'Identifying the Most Used Online Platform Digital Services at Western Mindanao State University Pagadian',
+      text: 'Thank you for responding to our survey. We appreciate your feedback!',
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+
+    console.log('Email sent:', info.response);
+    
+    return true;
+  } catch (error) {
+    console.error('Error sending email:', error);
+    return false; 
+  }
+}
 
 
 app.listen(PORT, () => {
