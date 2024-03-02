@@ -7,7 +7,7 @@ const Question4 = ({ formData, handleInputChange }) => {
         formData.otherSpecify4 = '';
     }
 
-    const isAnswered = formData.question4 !== '';
+    const isAnswered = formData.question4 && formData.communicationApp!== '';
     return (
         <div className="mb-3">
             <label className="form-label"><h6>4. How do you primarily communicate with your peers online?</h6></label>

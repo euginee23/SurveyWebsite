@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import SurveyForm from './pages/surveyForm';
+import SuccessPage from './pages/successPage';
 import ScrollToTop from './components/srollToTop';
 
 function App() {
-
   return (
-    <div>
 
+    <div>
       {/* Top Bar */}
       <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
         <div className="container">
@@ -18,14 +19,19 @@ function App() {
         </div>
       </nav>
 
-      {/* Survey Form */}
-      <div className="container mt-4">
-        <SurveyForm />
-      </div>
-
-      <ScrollToTop/>
+      {/* Main content */}
+      <Router>
+        <Routes>
+          <Route path="/" element={<SurveyForm />} />
+          <Route path="/success" element={<SuccessPage />} />
+        </Routes>
+      </Router >
+      
+      {/* ScrollToTop component */}
+      <ScrollToTop />
 
     </div>
+
   );
 }
 
