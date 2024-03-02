@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { validateForm } from '../validation/userInfoValidation';
 import { validateQuestions } from '../validation/questionValidation';
+import ScrollToError from '../components/scrollToError';
 import Question1 from './questions/question1';
 import Question2 from './questions/question2';
 import Question3 from './questions/question3';
@@ -36,6 +37,8 @@ const SurveyForm = () => {
   });
 
   const [formErrors, setFormErrors] = useState({});
+  const firstErrorRef = useRef();
+
   const handleInputChange = (event) => {
     const { name, value } = event.target;
 
@@ -95,6 +98,15 @@ const SurveyForm = () => {
     }
   };
 
+  const scrollToError = () => {
+    // Scroll to the first error if it exists
+    if (firstErrorRef.current) {
+      firstErrorRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -108,7 +120,13 @@ const SurveyForm = () => {
 
     setFormErrors(errors);
 
+    const firstErrorKey = Object.keys(errors)[0];
+    if (firstErrorKey) {
+      firstErrorRef.current = document.getElementById(`error-${firstErrorKey}`);
+    }
+
     if (Object.keys(errors).length > 0) {
+      scrollToError();
       return;
     }
 
@@ -137,6 +155,7 @@ const SurveyForm = () => {
   };
 
   return (
+
     <div className="container mt-4 mb-4">
       <div className="container mt-4 mb-4" style={{ boxShadow: '0 5px 20px rgba(1, 1, 1, 0.16)', borderRadius: '8px', overflow: 'hidden', marginTop: '8px', marginBottom: '20px', maxWidth: '900px' }}>
 
@@ -144,14 +163,14 @@ const SurveyForm = () => {
           <h5 style={{ marginLeft: '15px', marginTop: '10px' }}>Please fill in needed information</h5>
         </div>
 
-        {formErrors.global && <div className="alert alert-danger">{formErrors.global}</div>}
+        {formErrors.global && <div id="error-global" className="alert alert-danger">{formErrors.global}</div>}
         <div className="container mt-4 mb-4">
 
           <form onSubmit={handleSubmit}>
 
             <div className="mb-3">
               <label className="form-label"><h6>Enter your name:</h6></label>
-              
+
               <input
                 type="text"
                 className="form-control"
@@ -161,9 +180,9 @@ const SurveyForm = () => {
                 onChange={handleInputChange}
                 required
               />
-              {formErrors.firstName && <div className="alert alert-danger">{formErrors.firstName}</div>}
+              {formErrors.firstName && <div id="error-firstName" className="alert alert-danger">{formErrors.firstName}</div>}
 
-              
+
               <input
                 type="text"
                 className="form-control mt-2"
@@ -173,12 +192,12 @@ const SurveyForm = () => {
                 onChange={handleInputChange}
                 required
               />
-              {formErrors.lastName && <div className="alert alert-danger">{formErrors.lastName}</div>}
+              {formErrors.lastName && <div id="error-lastName" className="alert alert-danger">{formErrors.lastName}</div>}
             </div>
 
             <div className="mb-3">
               <label className="form-label"><h6>Select position:</h6></label>
-              {formErrors.position && <div className="alert alert-danger">{formErrors.position}</div>}
+              {formErrors.position && <div id="error-position" className="alert alert-danger">{formErrors.position}</div>}
               <div className="form-check">
                 <input
                   className="form-check-input"
@@ -222,7 +241,7 @@ const SurveyForm = () => {
                   </select>
                 </div>
               )}
-              {formErrors.course && <div className="alert alert-danger">{formErrors.course}</div>}
+              {formErrors.course && <div id="error-course" className="alert alert-danger">{formErrors.course}</div>}
             </div>
 
             <div className="mb-3">
@@ -236,12 +255,14 @@ const SurveyForm = () => {
                 onChange={handleInputChange}
                 required
               />
-              {formErrors.email && <div className="alert alert-danger">{formErrors.email}</div>}
+              {formErrors.email && <div id="error-email" className="alert alert-danger">{formErrors.email}</div>}
             </div>
 
           </form>
         </div>
       </div>
+
+      <ScrollToError firstErrorRef={firstErrorRef} />
 
       <div className="container mt-4 mb-4" style={{ boxShadow: '0 5px 20px rgba(1, 1, 1, 0.2)', borderRadius: '8px', overflow: 'hidden', marginTop: '8px', marginBottom: '20px', maxWidth: '900px' }}>
 
@@ -251,57 +272,57 @@ const SurveyForm = () => {
 
         <form onSubmit={handleSubmit}>
 
-          {formErrors.question1 && <div className="alert alert-danger">{formErrors.question1}</div>}
+          {formErrors.question1 && <div id="error-question1" className="alert alert-danger">{formErrors.question1}</div>}
           <div className="card" style={{ boxShadow: '0 5px 20px rgba(1, 1, 1, 0.2)', borderRadius: '8px', overflow: 'hidden', margin: '20px' }}>
             <div className="card-body">
               <Question1 formData={formData} handleInputChange={handleInputChange} />
             </div>
           </div>
 
-          {formErrors.question2 && <div className="alert alert-danger">{formErrors.question2}</div>}
+          {formErrors.question2 && <div id="error-question2" className="alert alert-danger">{formErrors.question2}</div>}
           <div className="card" style={{ boxShadow: '0 5px 20px rgba(1, 1, 1, 0.2)', borderRadius: '8px', overflow: 'hidden', margin: '20px' }}>
             <div className="card-body">
               <Question2 formData={formData} handleInputChange={handleInputChange} />
             </div>
           </div>
 
-          {formErrors.question3 && <div className="alert alert-danger">{formErrors.question3}</div>}
+          {formErrors.question3 && <div id="error-question3" className="alert alert-danger">{formErrors.question3}</div>}
           <div className="card" style={{ boxShadow: '0 5px 20px rgba(1, 1, 1, 0.2)', borderRadius: '8px', overflow: 'hidden', margin: '20px' }}>
             <div className="card-body">
               <Question3 formData={formData} handleInputChange={handleInputChange} />
             </div>
           </div>
 
-          {formErrors.communicationApp && <div className="alert alert-danger">{formErrors.communicationApp}</div>}
-          {formErrors.question4 && <div className="alert alert-danger">{formErrors.question4}</div>}
+          {formErrors.communicationApp && <div id="error-communicationApp" className="alert alert-danger">{formErrors.communicationApp}</div>}
+          {formErrors.question4 && <div id="error-question4" className="alert alert-danger">{formErrors.question4}</div>}
           <div className="card" style={{ boxShadow: '0 5px 20px rgba(1, 1, 1, 0.2)', borderRadius: '8px', overflow: 'hidden', margin: '20px' }}>
             <div className="card-body">
               <Question4 formData={formData} handleInputChange={handleInputChange} />
             </div>
           </div>
 
-          {formErrors.question5 && <div className="alert alert-danger">{formErrors.question5}</div>}
+          {formErrors.question5 && <div id="error-question5" className="alert alert-danger">{formErrors.question5}</div>}
           <div className="card" style={{ boxShadow: '0 5px 20px rgba(1, 1, 1, 0.2)', borderRadius: '8px', overflow: 'hidden', margin: '20px' }}>
             <div className="card-body">
               <Question5 formData={formData} handleInputChange={handleInputChange} />
             </div>
           </div>
 
-          {formErrors.question6 && <div className="alert alert-danger">{formErrors.question6}</div>}
+          {formErrors.question6 && <div id="error-question6" className="alert alert-danger">{formErrors.question6}</div>}
           <div className="card" style={{ boxShadow: '0 5px 20px rgba(1, 1, 1, 0.2)', borderRadius: '8px', overflow: 'hidden', margin: '20px' }}>
             <div className="card-body">
               <Question6 formData={formData} handleInputChange={handleInputChange} />
             </div>
           </div>
 
-          {formErrors.question7 && <div className="alert alert-danger">{formErrors.question7}</div>}
+          {formErrors.question7 && <div id="error-question7" className="alert alert-danger">{formErrors.question7}</div>}
           <div className="card" style={{ boxShadow: '0 5px 20px rgba(1, 1, 1, 0.2)', borderRadius: '8px', overflow: 'hidden', margin: '20px' }}>
             <div className="card-body">
               <Question7 formData={formData} handleInputChange={handleInputChange} />
             </div>
           </div>
 
-          {formErrors.question8 && <div className="alert alert-danger">{formErrors.question8}</div>}
+          {formErrors.question8 && <div id="error-question8" className="alert alert-danger">{formErrors.question8}</div>}
           <div className="card" style={{ boxShadow: '0 5px 20px rgba(1, 1, 1, 0.2)', borderRadius: '8px', overflow: 'hidden', margin: '20px' }}>
             <div className="card-body">
               <Question8 formData={formData} handleInputChange={handleInputChange} />
