@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import SurveyForm from './pages/surveyForm';
+import ScrollToTop from './components/srollToTop';
 
 function App() {
+
   return (
     <div>
+
       {/* Top Bar */}
       <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
         <div className="container">
@@ -19,7 +22,9 @@ function App() {
       <div className="container mt-4">
         <SurveyForm />
       </div>
-      
+
+      <ScrollToTop/>
+
     </div>
   );
 }
