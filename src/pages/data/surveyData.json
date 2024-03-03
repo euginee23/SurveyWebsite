@@ -1,0 +1,35 @@
+[
+  {
+    "respondent": 1,
+    "social_media": "Facebook",
+    "hours": "Less than 1 hour",
+    "streaming": "Netflix",
+    "communication": "Facebook Messenger",
+    "content": "Text-based posts",
+    "influenced": "Content shared by friends",
+    "sharing_content": "Never",
+    "device": "Desktop computer"
+  },
+  {
+    "respondent": 2,
+    "social_media": "Instragram",
+    "hours": "Less than 1 hour",
+    "streaming": "YouTube",
+    "communication": "Facebook Messenger",
+    "content": "Text-based posts",
+    "influenced": "Content shared by friends",
+    "sharing_content": "Daily",
+    "device": "Smartphone"
+  },
+  {
+    "respondent": 3,
+    "social_media": "LinkedIn",
+    "hours": "Less than 1 hour",
+    "streaming": "Twitch",
+    "communication": "Discord",
+    "content": "Text-based posts",
+    "influenced": "Content shared by friends",
+    "sharing_content": "Daily",
+    "device": "Smartphone"
+  }
+]

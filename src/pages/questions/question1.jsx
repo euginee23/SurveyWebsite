@@ -11,7 +11,7 @@ const Question1 = ({ formData, handleInputChange }) => {
 
     return (
         <div className="mb-3">
-            <label className="form-label"><h6>1. Which online media platform do you use most frequently?</h6></label>
+            <label className="form-label"><h6>1. Which online social media platform do you use most frequently?</h6></label>
             {isAnswered && <FaCheck style={{ color: 'green', marginLeft: '5px' }} />}
 
             <div className="form-check">

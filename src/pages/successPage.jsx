@@ -16,7 +16,7 @@ const SuccessPage = () => {
         </div>
 
         <div className="container mt-4">
-          <h2 style={{ margin: '25px'}}>Thank you! We appreciate your submission.</h2>
+          <h2 style={{ margin: '25px'}}>Thank you for submitting! We appreciate your time.</h2>
 
           <div className="d-flex justify-content-end">
           <Link to="/" className="btn btn-success btn-lg mb-4 mt-1" style={{ margin: '10px'}} onClick={handleSubmitAnother}>

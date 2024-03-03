@@ -297,7 +297,7 @@ const SurveyForm = () => {
       <div className="container mt-4 mb-4" style={{ boxShadow: '0 5px 20px rgba(1, 1, 1, 0.2)', borderRadius: '8px', overflow: 'hidden', marginTop: '8px', marginBottom: '20px', maxWidth: '900px' }}>
 
         <div className="header bg-primary" style={{ color: 'white', padding: '20px', borderRadius: '8px 8px 0 0', marginLeft: '-12px', marginRight: '-12px', marginBottom: '20px', textAlign: 'center' }}>
-          <h5>Identifying the Most Used Online Platform Digital Services at Western Mindanao State University Pagadian</h5>
+          <h5>Identifying the Most Used Online Platform Digital Media at Western Mindanao State University Pagadian</h5>
         </div>
 
         <form onSubmit={handleSubmit}>

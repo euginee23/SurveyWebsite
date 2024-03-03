@@ -5,7 +5,7 @@ const Question2 = ({ formData, handleInputChange }) => {
     const isAnswered = formData.question2 !== '';
     return (
         <div className="mb-3">
-            <label className="form-label"><h6>2. How many hours per week do you typically spend on social media platforms?</h6></label>
+            <label className="form-label"><h6>2. How many hours in a day do you typically spend on your social media platform?</h6></label>
             {isAnswered && <FaCheck style={{ color: 'green', marginLeft: '5px' }} />}
 
             <div className="form-check">

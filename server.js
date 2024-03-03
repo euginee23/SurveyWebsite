@@ -3,6 +3,8 @@ const cors = require('cors');
 const db = require('./db');
 const nodemailer = require('nodemailer');
 const app = express();
+const fs = require('fs');
+const path = require('path');
 
 const PORT = process.env.PORT || 5000;
 
@@ -154,21 +156,189 @@ async function sendThankYouEmail(email) {
     const mailOptions = {
       from: 'molaveengineering@gmail.com',
       to: email,
-      subject: 'Identifying the Most Used Online Platform Digital Services at Western Mindanao State University Pagadian',
+      subject: 'Identifying the Most Used Online Platform Digital Media at Western Mindanao State University Pagadian',
       text: 'Thank you for responding to our survey. We appreciate your feedback!',
     };
 
     const info = await transporter.sendMail(mailOptions);
 
     console.log('Email sent:', info.response);
-    
+
     return true;
   } catch (error) {
     console.error('Error sending email:', error);
-    return false; 
+    return false;
   }
 }
 
+// GET TOTAL RESPONSES
+app.get('/api/getTotalResponses', async (req, res) => {
+  try {
+    const connection = await db.getConnection();
+    const [result] = await connection.query('SELECT COUNT(*) AS totalResponses FROM survey');
+
+    const totalResponses = result[0].totalResponses;
+
+    connection.release();
+
+    res.status(200).json({ totalResponses });
+  } catch (error) {
+    console.error('Error fetching total responses:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// USER POSITION RETRIEVE
+app.get('/api/getPositionChartData', async (req, res) => {
+  try {
+    const connection = await db.getConnection();
+
+    const [instructorCount] = await connection.query('SELECT COUNT(*) as count FROM users WHERE position = "instructor"');
+    const [studentCount] = await connection.query('SELECT COUNT(*) as count FROM users WHERE position = "student"');
+
+    const instructorData = {
+      label: 'instructor',
+      count: instructorCount[0].count,
+    };
+
+    const studentData = {
+      label: 'student',
+      count: studentCount[0].count,
+    };
+
+    const chartData = [instructorData, studentData];
+
+    // JSON WRITE TO PATH
+    const jsonDataPath = path.join(__dirname, 'src', 'pages', 'data', 'usersData.json');
+    fs.writeFileSync(jsonDataPath, JSON.stringify(chartData, null, 2), 'utf-8');
+
+    connection.release();
+
+    res.status(200).json(chartData);
+  } catch (error) {
+    console.error('Error fetching position chart data:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// GET MEDIA PLATFORM
+app.get('/api/getMediaPlatformChartData', async (req, res) => {
+  try {
+    const connection = await db.getConnection();
+
+    const [mediaPlatformCounts] = await connection.query(
+      'SELECT question1_response as label, COUNT(*) as count FROM survey GROUP BY question1_response'
+    );
+
+    // JSON WRITE TO PATH
+    const jsonDataPath = path.join(__dirname, 'src', 'pages', 'data', 'mediaPlatformData.json');
+    fs.writeFileSync(jsonDataPath, JSON.stringify(mediaPlatformCounts, null, 2), 'utf-8');
+
+    connection.release();
+
+    res.status(200).json(mediaPlatformCounts);
+  } catch (error) {
+    console.error('Error fetching media platform chart data:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// GET COMMUNCATION PLATFORM
+app.get('/api/getCommuncationPlatformChartData', async (req, res) => {
+  try {
+    const connection = await db.getConnection();
+
+    const [mediaPlatformCounts] = await connection.query(
+      'SELECT question4_response as label, COUNT(*) as count FROM survey GROUP BY question4_response'
+    );
+
+    // JSON WRITE TO PATH
+    const jsonDataPath = path.join(__dirname, 'src', 'pages', 'data', 'communicationPlatformData.json');
+    fs.writeFileSync(jsonDataPath, JSON.stringify(mediaPlatformCounts, null, 2), 'utf-8');
+
+    connection.release();
+
+    res.status(200).json(mediaPlatformCounts);
+  } catch (error) {
+    console.error('Error fetching communcation platform chart data:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// GET STREAMING PLATFORM
+app.get('/api/getStreamingPlatformChartData', async (req, res) => {
+  try {
+    const connection = await db.getConnection();
+
+    const [mediaPlatformCounts] = await connection.query(
+      'SELECT question3_response as label, COUNT(*) as count FROM survey GROUP BY question3_response'
+    );
+
+    // JSON WRITE TO PATH
+    const jsonDataPath = path.join(__dirname, 'src', 'pages', 'data', 'streamingPlatformData.json');
+    fs.writeFileSync(jsonDataPath, JSON.stringify(mediaPlatformCounts, null, 2), 'utf-8');
+
+    connection.release();
+
+    res.status(200).json(mediaPlatformCounts);
+  } catch (error) {
+    console.error('Error fetching streaming platform chart data:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// GET STUDENT COURSE
+app.get('/api/getStudentCourseChartData', async (req, res) => {
+  try {
+    const connection = await db.getConnection();
+
+    const [studentCourseCounts] = await connection.query(
+      'SELECT course as label, COUNT(course) as count FROM users WHERE position = "student" GROUP BY course'
+    );
+
+    // JSON WRITE TO PATH
+    const jsonDataPath = path.join(__dirname, 'src', 'pages', 'data', 'studentCourseData.json');
+    fs.writeFileSync(jsonDataPath, JSON.stringify(studentCourseCounts, null, 2), 'utf-8');
+
+    connection.release();
+
+    res.status(200).json(studentCourseCounts);
+  } catch (error) {
+    console.error('Error fetching student course chart data:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// GET SURVEY DATA
+app.get('/api/getSurveyData', async (req, res) => {
+  try {
+    const connection = await db.getConnection();
+
+    const [surveyData] = await connection.query(`
+      SELECT ROW_NUMBER() OVER (ORDER BY user_id) as respondent,
+             question1_response as social_media,
+             question2_response as hours,
+             question3_response as streaming,
+             question4_response as communication,
+             question5_response as content,
+             question6_response as influenced,
+             question7_response as sharing_content,
+             question8_response as device
+      FROM survey
+    `);
+
+    // JSON WRITE TO PATH (Async)
+    const jsonDataPath = path.join(__dirname, 'src', 'pages', 'data', 'surveyData.json');
+    fs.promises.writeFile(jsonDataPath, JSON.stringify(surveyData, null, 2), 'utf-8');
+
+    connection.release();
+
+    res.status(200).json(surveyData);
+  } catch (error) {
+    console.error('Error fetching survey data:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
