@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import apiUrl from '../../apiUrl';
 import { useNavigate } from 'react-router-dom';
 import { validateForm } from '../validation/userInfoValidation';
 import { validateQuestions } from '../validation/questionValidation';
@@ -14,6 +15,7 @@ import Question7 from './questions/question7';
 import Question8 from './questions/question8';
 
 const SurveyForm = () => {
+
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: '',
@@ -101,7 +103,6 @@ const SurveyForm = () => {
   };
 
   const scrollToError = () => {
-    // Scroll to the first error if it exists
     if (firstErrorRef.current) {
       firstErrorRef.current.scrollIntoView({
         behavior: 'smooth',
@@ -135,8 +136,7 @@ const SurveyForm = () => {
     }
 
     try {
-      // Check if the email is already in use
-      const emailCheckResponse = await fetch('http://localhost:5000/api/checkEmail', {
+      const emailCheckResponse = await fetch(`${apiUrl}/api/checkEmail`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -147,7 +147,6 @@ const SurveyForm = () => {
       const emailCheckData = await emailCheckResponse.json();
   
       if (emailCheckData.emailInUse) {
-        // Email is already in use, show SweetAlert2 alert
         await Swal.fire({
           icon: 'error',
           title: 'Oops...',
@@ -158,8 +157,7 @@ const SurveyForm = () => {
         return;
       }
   
-      // Continue with the form submission if email is not in use
-      const response = await fetch('http://localhost:5000/api/submitForm', {
+      const response = await fetch(`${apiUrl}/api/submitForm`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -266,8 +264,13 @@ const SurveyForm = () => {
                   >
                     <option value="">Select Course</option>
                     <option value="BSCS">BSCS (Bachelor of Science in Computer Science)</option>
+                    <option value="ACT">ACT (Associate in Computer Technology)</option>
                     <option value="ABPS">ABPS (Bachelor of Arts in Political Science)</option>
                     <option value="BS_CRIM">BS CRIM (Bachelor of Science in Criminology)</option>
+                    <option value="BSSW">BSSW (Bachelor of Science in Social Work)</option>
+                    <option value="BEED">BEED (Bachelor of Elementary Education)</option>
+                    <option value="BSED_English">BSED English (Bachelor of Secondary Education Major in English)</option>
+                    <option value="BSED_Science">BSED Science (Bachelor of Secondary Education Major in Science)</option>
                   </select>
                 </div>
               )}

@@ -1,17 +1,6 @@
 [
   {
     "respondent": 1,
-    "social_media": "Facebook",
-    "hours": "Less than 1 hour",
-    "streaming": "Netflix",
-    "communication": "Facebook Messenger",
-    "content": "Text-based posts",
-    "influenced": "Content shared by friends",
-    "sharing_content": "Never",
-    "device": "Desktop computer"
-  },
-  {
-    "respondent": 2,
     "social_media": "Instragram",
     "hours": "Less than 1 hour",
     "streaming": "YouTube",
@@ -22,7 +11,7 @@
     "device": "Smartphone"
   },
   {
-    "respondent": 3,
+    "respondent": 2,
     "social_media": "LinkedIn",
     "hours": "Less than 1 hour",
     "streaming": "Twitch",
@@ -30,6 +19,17 @@
     "content": "Text-based posts",
     "influenced": "Content shared by friends",
     "sharing_content": "Daily",
+    "device": "Smartphone"
+  },
+  {
+    "respondent": 3,
+    "social_media": "Facebook",
+    "hours": "4-6 hours",
+    "streaming": "YouTube",
+    "communication": "Facebook Messenger",
+    "content": "Memes and humor",
+    "influenced": "Content shared by friends",
+    "sharing_content": "Weekly",
     "device": "Smartphone"
   }
 ]

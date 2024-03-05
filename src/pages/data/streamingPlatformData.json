@@ -1,14 +1,10 @@
 [
   {
-    "label": "Netflix",
-    "count": 1
-  },
-  {
     "label": "Twitch",
     "count": 1
   },
   {
     "label": "YouTube",
-    "count": 1
+    "count": 2
   }
 ]

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import apiUrl from '../../apiUrl';
 import { Chart as ChartJS, defaults } from "chart.js/auto";
 import { Bar, Doughnut, Line } from "react-chartjs-2";
 import ExcelDownload from '../components/downloadExcel';
@@ -20,7 +21,7 @@ const Dashboard = () => {
     useEffect(() => {
         const fetchTotalResponses = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/getTotalResponses');
+                const response = await fetch(`${apiUrl}/api/getTotalResponses`);
                 const data = await response.json();
                 setTotalResponses(data.totalResponses);
             } catch (error) {
@@ -42,27 +43,27 @@ const Dashboard = () => {
 
     const updateChartData = async () => {
         try {
-            const positionResponse = await fetch('http://localhost:5000/api/getPositionChartData');
+            const positionResponse = await fetch(`${apiUrl}/api/getPositionChartData`);
             const positionData = await positionResponse.json();
             console.log('Position chart data updated:', positionData);
 
-            const mediaPlatformResponse = await fetch('http://localhost:5000/api/getMediaPlatformChartData');
+            const mediaPlatformResponse = await fetch(`${apiUrl}/api/getMediaPlatformChartData`);
             const mediaPlatformData = await mediaPlatformResponse.json();
             console.log('Media platform chart data updated:', mediaPlatformData);
 
-            const streamingPlatformResponse = await fetch('http://localhost:5000/api/getStreamingPlatformChartData');
+            const streamingPlatformResponse = await fetch(`${apiUrl}/api/getStreamingPlatformChartData`);
             const streamingPlatformData = await streamingPlatformResponse.json();
             console.log('Streaming platform chart data updated:', streamingPlatformData);
 
-            const communicationPlatformResponse = await fetch('http://localhost:5000/api/getCommuncationPlatformChartData');
+            const communicationPlatformResponse = await fetch(`${apiUrl}/api/getCommuncationPlatformChartData`);
             const communicationPlatformData = await communicationPlatformResponse.json();
             console.log('Media platform chart data updated:', communicationPlatformData);
 
-            const studentCourseResponse = await fetch('http://localhost:5000/api/getStudentCourseChartData');
+            const studentCourseResponse = await fetch(`${apiUrl}/api/getStudentCourseChartData`);
             const studentCourseData = await studentCourseResponse.json();
             console.log('Student course chart data updated:', studentCourseData);
 
-            const surveyResponses = await fetch('http://localhost:5000/api/getSurveyData');
+            const surveyResponses = await fetch(`${apiUrl}/api/getSurveyData`);
             const surveyData = await surveyResponses.json();
             console.log('Survey data updated:', surveyData);
 
