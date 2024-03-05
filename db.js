@@ -5,7 +5,7 @@ const dbConfig = {
     user: 'root',
     password: '',
     database: 'survey_website_db',
-    connectionLimit: 10,
+    connectionLimit: 100,
 };
 
 const pool = mysql.createPool(dbConfig);
