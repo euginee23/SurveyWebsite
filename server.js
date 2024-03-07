@@ -208,10 +208,6 @@ app.get('/api/getPositionChartData', async (req, res) => {
 
     const chartData = [instructorData, studentData];
 
-    // JSON WRITE TO PATH
-    const jsonDataPath = path.join(__dirname, 'src', 'pages', 'data', 'usersData.json');
-    fs.writeFileSync(jsonDataPath, JSON.stringify(chartData, null, 2), 'utf-8');
-
     connection.release();
 
     res.status(200).json(chartData);
@@ -229,10 +225,6 @@ app.get('/api/getMediaPlatformChartData', async (req, res) => {
     const [mediaPlatformCounts] = await connection.query(
       'SELECT question1_response as label, COUNT(*) as count FROM survey GROUP BY question1_response'
     );
-
-    // JSON WRITE TO PATH
-    const jsonDataPath = path.join(__dirname, 'src', 'pages', 'data', 'mediaPlatformData.json');
-    fs.writeFileSync(jsonDataPath, JSON.stringify(mediaPlatformCounts, null, 2), 'utf-8');
 
     connection.release();
 
@@ -252,15 +244,11 @@ app.get('/api/getCommuncationPlatformChartData', async (req, res) => {
       'SELECT question4_response as label, COUNT(*) as count FROM survey GROUP BY question4_response'
     );
 
-    // JSON WRITE TO PATH
-    const jsonDataPath = path.join(__dirname, 'src', 'pages', 'data', 'communicationPlatformData.json');
-    fs.writeFileSync(jsonDataPath, JSON.stringify(mediaPlatformCounts, null, 2), 'utf-8');
-
     connection.release();
 
     res.status(200).json(mediaPlatformCounts);
   } catch (error) {
-    console.error('Error fetching communcation platform chart data:', error.message);
+    console.error('Error fetching communication platform chart data:', error.message);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
@@ -273,10 +261,6 @@ app.get('/api/getStreamingPlatformChartData', async (req, res) => {
     const [mediaPlatformCounts] = await connection.query(
       'SELECT question3_response as label, COUNT(*) as count FROM survey GROUP BY question3_response'
     );
-
-    // JSON WRITE TO PATH
-    const jsonDataPath = path.join(__dirname, 'src', 'pages', 'data', 'streamingPlatformData.json');
-    fs.writeFileSync(jsonDataPath, JSON.stringify(mediaPlatformCounts, null, 2), 'utf-8');
 
     connection.release();
 
@@ -295,10 +279,6 @@ app.get('/api/getStudentCourseChartData', async (req, res) => {
     const [studentCourseCounts] = await connection.query(
       'SELECT course as label, COUNT(course) as count FROM users WHERE position = "student" GROUP BY course'
     );
-
-    // JSON WRITE TO PATH
-    const jsonDataPath = path.join(__dirname, 'src', 'pages', 'data', 'studentCourseData.json');
-    fs.writeFileSync(jsonDataPath, JSON.stringify(studentCourseCounts, null, 2), 'utf-8');
 
     connection.release();
 
@@ -326,10 +306,6 @@ app.get('/api/getSurveyData', async (req, res) => {
              question8_response as device
       FROM survey
     `);
-
-    // JSON WRITE TO PATH (Async)
-    const jsonDataPath = path.join(__dirname, 'src', 'pages', 'data', 'surveyData.json');
-    fs.promises.writeFile(jsonDataPath, JSON.stringify(surveyData, null, 2), 'utf-8');
 
     connection.release();
 

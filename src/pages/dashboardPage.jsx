@@ -5,19 +5,59 @@ import { Bar, Doughnut, Line } from "react-chartjs-2";
 import ExcelDownload from '../components/downloadExcel';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import userData from './data/usersData.json';
-import mediaData from './data/mediaPlatformData.json';
-import streamingData from './data/streamingPlatformData.json';
-import communicationData from './data/communicationPlatformData.json';
-import courseData from './data/studentCourseData.json';
-import surveyData from './data/surveyData.json';
 
 const Dashboard = () => {
     const [totalResponses, setTotalResponses] = useState(0);
-    const [selectedData, setSelectedData] = useState(mediaData);
+    const [selectedData, setSelectedData] = useState([]);
     const [cardTitle, setCardTitle] = useState("Most used Social Media Platform");
     const [initialLoad, setInitialLoad] = useState(true);
+    const [surveyData, setSurveyData] = useState([]);
+    const [userData, setPositionData] = useState([]);
+    const [courseData, setCourseData] = useState([]);
+    const [mediaPlatformData, setMediaPlatformData] = useState([]);
+    const [streamingPlatformData, setStreamingPlatformData] = useState([]);
+    const [communicationPlatformData, setCommunicationPlatformData] = useState([]);
 
+    const fetchData = async () => {
+        try {
+            const positionResponse = await fetch(`${apiUrl}/api/getPositionChartData`);
+            const positionData = await positionResponse.json();
+            console.log('Position chart data updated:', positionData);
+            setPositionData(positionData);
+
+            const mediaPlatformResponse = await fetch(`${apiUrl}/api/getMediaPlatformChartData`);
+            const mediaPlatformData = await mediaPlatformResponse.json();
+            console.log('Media platform chart data updated:', mediaPlatformData);
+            setMediaPlatformData(mediaPlatformData);
+
+            const streamingPlatformResponse = await fetch(`${apiUrl}/api/getStreamingPlatformChartData`);
+            const streamingPlatformData = await streamingPlatformResponse.json();
+            console.log('Streaming platform chart data updated:', streamingPlatformData);
+            setStreamingPlatformData(streamingPlatformData);
+
+            const communicationPlatformResponse = await fetch(`${apiUrl}/api/getCommuncationPlatformChartData`);
+            const communicationPlatformData = await communicationPlatformResponse.json();
+            console.log('Communication platform chart data updated:', communicationPlatformData);
+            setCommunicationPlatformData(communicationPlatformData);
+
+            const studentCourseResponse = await fetch(`${apiUrl}/api/getStudentCourseChartData`);
+            const studentCourseData = await studentCourseResponse.json();
+            console.log('Student course chart data updated:', studentCourseData);
+            setCourseData(studentCourseData);
+
+            const surveyResponses = await fetch(`${apiUrl}/api/getSurveyData`);
+            const surveyData = await surveyResponses.json();
+            console.log('Survey data updated:', surveyData);
+            setSurveyData(surveyData);
+
+            setSelectedData(mediaPlatformData);
+
+            notify('Chart data updated!');
+        } catch (error) {
+            console.error('Error updating chart data:', error.message);
+        }
+    };
+    
     useEffect(() => {
         const fetchTotalResponses = async () => {
             try {
@@ -30,7 +70,7 @@ const Dashboard = () => {
         };
 
         if (initialLoad) {
-            updateChartData();
+            fetchData();
             setInitialLoad(false);
         }
 
@@ -41,41 +81,9 @@ const Dashboard = () => {
         toast.info(message);
     };
 
-    const updateChartData = async () => {
-        try {
-            const positionResponse = await fetch(`${apiUrl}/api/getPositionChartData`);
-            const positionData = await positionResponse.json();
-            console.log('Position chart data updated:', positionData);
-
-            const mediaPlatformResponse = await fetch(`${apiUrl}/api/getMediaPlatformChartData`);
-            const mediaPlatformData = await mediaPlatformResponse.json();
-            console.log('Media platform chart data updated:', mediaPlatformData);
-
-            const streamingPlatformResponse = await fetch(`${apiUrl}/api/getStreamingPlatformChartData`);
-            const streamingPlatformData = await streamingPlatformResponse.json();
-            console.log('Streaming platform chart data updated:', streamingPlatformData);
-
-            const communicationPlatformResponse = await fetch(`${apiUrl}/api/getCommuncationPlatformChartData`);
-            const communicationPlatformData = await communicationPlatformResponse.json();
-            console.log('Media platform chart data updated:', communicationPlatformData);
-
-            const studentCourseResponse = await fetch(`${apiUrl}/api/getStudentCourseChartData`);
-            const studentCourseData = await studentCourseResponse.json();
-            console.log('Student course chart data updated:', studentCourseData);
-
-            const surveyResponses = await fetch(`${apiUrl}/api/getSurveyData`);
-            const surveyData = await surveyResponses.json();
-            console.log('Survey data updated:', surveyData);
-
-            notify('Chart data updated!');
-        } catch (error) {
-            console.error('Error updating chart data:', error.message);
-        }
-    };
-
     const handleUpdateData = async () => {
         try {
-            await updateChartData();
+            await fetchData();
             window.location.reload();
         } catch (error) {
             console.error('Error updating chart data:', error.message);
@@ -104,19 +112,19 @@ const Dashboard = () => {
     const filterChartData = (selected) => {
         switch (selected) {
             case 'media':
-                setSelectedData(mediaData);
+                setSelectedData(mediaPlatformData);
                 setCardTitle("Most used Social Media Platform");
                 break;
             case 'streaming':
-                setSelectedData(streamingData);
+                setSelectedData(streamingPlatformData);
                 setCardTitle("Most used Streaming Platform");
                 break;
             case 'communication':
-                setSelectedData(communicationData);
+                setSelectedData(communicationPlatformData);
                 setCardTitle("Most used Communication Platform");
                 break;
             default:
-                setSelectedData(mediaData);
+                setSelectedData(mediaPlatformData);
                 setCardTitle("Most used Social Media Platform");
                 break;
         }
@@ -126,7 +134,7 @@ const Dashboard = () => {
         <div className="container mt-4 mb-4">
             <div className="container mt-4" style={{ boxShadow: '0 5px 20px rgba(1, 1, 1, 0.16)', borderRadius: '8px', overflow: 'hidden', marginTop: '8px', marginBottom: 'auto', maxWidth: '1100px', padding: "30px" }}>
                 <h2 className="mb-4">Survey Dashboard</h2>
-
+    
                 <div className="row">
                     <div className="col-md-4 mb-4">
                         <div className="card">
@@ -136,7 +144,7 @@ const Dashboard = () => {
                             </div>
                         </div>
                     </div>
-
+    
                     <div className="col-md-4 mb-4">
                         <div className="card">
                             <div className="card-body">
@@ -145,7 +153,7 @@ const Dashboard = () => {
                             </div>
                         </div>
                     </div>
-
+    
                     <div className="col-md-4 mb-4">
                         <div className="card">
                             <div className="card-body">
@@ -157,9 +165,9 @@ const Dashboard = () => {
                         </div>
                     </div>
                 </div>
-
+    
                 <div className="mb-3 row">
-                    <label className="col-sm-2 col-form-label" ><h6>Select Data:</h6></label>
+                    <label className="col-sm-2 col-form-label"><h6>Select Data:</h6></label>
                     <div className="col-sm-10">
                         <select className="form-select" onChange={(e) => filterChartData(e.target.value)}>
                             <option value="media">Social Media</option>
@@ -168,7 +176,7 @@ const Dashboard = () => {
                         </select>
                     </div>
                 </div>
-
+    
                 <div className="col-md-12 mb-4">
                     <div className="card">
                         <div className="card-body">
@@ -188,7 +196,7 @@ const Dashboard = () => {
                         </div>
                     </div>
                 </div>
-
+    
                 <div className="row">
                     <div className="col-md-6 mb-4">
                         <div className="card">
@@ -224,7 +232,7 @@ const Dashboard = () => {
                             </div>
                         </div>
                     </div>
-
+    
                     <div className="col-md-6 mb-4">
                         <div className="card">
                             <div className="card-body">
@@ -243,12 +251,11 @@ const Dashboard = () => {
                             </div>
                         </div>
                     </div>
-
                 </div>
-
             </div>
         </div>
     );
+    
 };
 
 export default Dashboard;
