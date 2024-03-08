@@ -15,7 +15,7 @@ function App() {
         <div className="container">
           {/* Logo and Title */}
           <a className="navbar-brand d-flex align-items-center" href="/">
-            <img src="./logo/logo.png" alt="Logo" width="50" height="50" className="d-inline-block align-top" />
+            <img src="/dist/assets/logo-H-mZ1fqP.png" alt="Logo" width="50" height="50" className="d-inline-block align-top" />
             <h2 className="ms-2 mb-0">Survey Website</h2>
           </a>
         </div>
