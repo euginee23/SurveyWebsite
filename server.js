@@ -19,6 +19,11 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Starting route
+app.get('/', (_req, res) => {
+  res.send('HELLO SERVER');
+});
+
 // FORM SUBMISSION
 app.post('/api/submitForm', async (req, res) => {
   try {
