@@ -1,10 +1,10 @@
 const mysql = require('mysql2/promise');
 
 const dbConfig = {
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'survey_website_db',
+  host: 'blesfxrl4vbau3qf3rph-mysql.services.clever-cloud.com',
+  user: 'uyvysyqkhvngead3',
+  password: '6klYhnHRjvhm2W8bmX9l',
+  database: 'blesfxrl4vbau3qf3rph',
   connectionLimit: 10,
   waitForConnections: true, 
   queueLimit: 0, 
