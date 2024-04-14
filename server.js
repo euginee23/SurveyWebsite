@@ -19,17 +19,14 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Starting route
-app.get('/', (_req, res) => {
-  res.send('HELLO SERVER');
-});
-
 // FORM SUBMISSION
 app.post('/api/submitForm', async (req, res) => {
   try {
     const {
       firstName,
       lastName,
+      gender,
+      age,
       position,
       course,
       email,
@@ -47,6 +44,8 @@ app.post('/api/submitForm', async (req, res) => {
       question7,
       question8,
       otherSpecify8,
+      question9,
+      question10,
     } = req.body;
 
     const connection = await db.getConnection();
@@ -64,8 +63,8 @@ app.post('/api/submitForm', async (req, res) => {
       }
 
       const [userData] = await connection.query(
-        'INSERT INTO users (firstName, lastName, position, course, email) VALUES (?, ?, ?, ?, ?)',
-        [firstName, lastName, position, course, email]
+        'INSERT INTO users (firstName, lastName, gender, age, position, course, email) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [firstName, lastName, gender, age, position, course, email]
       );
 
       const userId = userData.insertId;
@@ -113,8 +112,8 @@ app.post('/api/submitForm', async (req, res) => {
       }
 
       await connection.query(
-        'INSERT INTO survey (user_id, question1_response, question2_response, question3_response, question4_response, question5_response, question6_response, question7_response, question8_response) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [userId, question1Response, question2, question3Response, question4Response, question5, question6Response, question7, question8Response]
+        'INSERT INTO survey (user_id, question1_response, question2_response, question3_response, question4_response, question5_response, question6_response, question7_response, question8_response, question9_response, question10_response) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [userId, question1Response, question2, question3Response, question4Response, question5, question6Response, question7, question8Response, question9, question10]
       );
 
       await connection.commit();
@@ -141,8 +140,10 @@ app.post('/api/submitForm', async (req, res) => {
 app.post('/api/checkEmail', async (req, res) => {
   try {
     const { email } = req.body;
+    const connection = await db.getConnection();
+    const [existingUser] = await connection.query('SELECT * FROM users WHERE email = ?', [email]);
 
-    const [existingUser] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+    connection.release();
 
     if (existingUser.length > 0) {
       res.json({ emailInUse: true });
@@ -308,7 +309,9 @@ app.get('/api/getSurveyData', async (req, res) => {
              question5_response as content,
              question6_response as influenced,
              question7_response as sharing_content,
-             question8_response as device
+             question8_response as device,
+             question9_response as impact,
+             question10_response as following
       FROM survey
     `);
 

@@ -13,6 +13,8 @@ import Question5 from './questions/question5';
 import Question6 from './questions/question6';
 import Question7 from './questions/question7';
 import Question8 from './questions/question8';
+import Question9 from './questions/question9';
+import Question10 from './questions/question10';
 
 const SurveyForm = () => {
 
@@ -20,6 +22,8 @@ const SurveyForm = () => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
+    gender:'',
+    age: '',
     position: '',
     course: '',
     email: '',
@@ -37,6 +41,8 @@ const SurveyForm = () => {
     question7: '',
     question8: '',
     otherSpecify8: '',
+    question9: '',
+    question10: '',
   });
 
   const [formErrors, setFormErrors] = useState({});
@@ -143,20 +149,20 @@ const SurveyForm = () => {
         },
         body: JSON.stringify({ email: formData.email }),
       });
-  
+
       const emailCheckData = await emailCheckResponse.json();
-  
+
       if (emailCheckData.emailInUse) {
         await Swal.fire({
           icon: 'error',
           title: 'Oops...',
           text: 'This email is already in use. Please use a different email.',
         });
-  
+
         setLoading(false);
         return;
       }
-  
+
       const response = await fetch(`${apiUrl}/api/submitForm`, {
         method: 'POST',
         headers: {
@@ -164,11 +170,11 @@ const SurveyForm = () => {
         },
         body: JSON.stringify(formData),
       });
-  
+
       const data = await response.json();
-  
+
       console.log('Server response:', data);
-  
+
       if (data.success) {
         console.log('Form submitted successfully!');
         navigate('/success');
@@ -221,6 +227,36 @@ const SurveyForm = () => {
                 required
               />
               {formErrors.lastName && <div id="error-lastName" className="alert alert-danger">{formErrors.lastName}</div>}
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label"><h6>Gender:</h6></label>
+              <select
+                className="form-select"
+                name="gender"
+                value={formData.gender}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+              {formErrors.gender && <div id="error-gender" className="alert alert-danger">{formErrors.gender}</div>}
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label"><h6>Enter your age:</h6></label>
+              <input
+                type="number"
+                className="form-control"
+                name="age"
+                placeholder="Age"
+                value={formData.age}
+                onChange={handleInputChange}
+                required
+              />
+              {formErrors.age && <div id="error-age" className="alert alert-danger">{formErrors.age}</div>}
             </div>
 
             <div className="mb-3">
@@ -359,6 +395,20 @@ const SurveyForm = () => {
           <div className="card" style={{ boxShadow: '0 5px 20px rgba(1, 1, 1, 0.2)', borderRadius: '8px', overflow: 'hidden', margin: '20px' }}>
             <div className="card-body">
               <Question8 formData={formData} handleInputChange={handleInputChange} />
+            </div>
+          </div>
+
+          {formErrors.question9 && <div id="error-question9" className="alert alert-danger">{formErrors.question9}</div>}
+          <div className="card" style={{ boxShadow: '0 5px 20px rgba(1, 1, 1, 0.2)', borderRadius: '8px', overflow: 'hidden', margin: '20px' }}>
+            <div className="card-body">
+              <Question9 formData={formData} handleInputChange={handleInputChange} />
+            </div>
+          </div>
+
+          {formErrors.question10 && <div id="error-question10" className="alert alert-danger">{formErrors.question10}</div>}
+          <div className="card" style={{ boxShadow: '0 5px 20px rgba(1, 1, 1, 0.2)', borderRadius: '8px', overflow: 'hidden', margin: '20px' }}>
+            <div className="card-body">
+              <Question10 formData={formData} handleInputChange={handleInputChange} />
             </div>
           </div>
 

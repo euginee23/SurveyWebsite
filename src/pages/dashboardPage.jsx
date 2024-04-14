@@ -84,7 +84,6 @@ const Dashboard = () => {
     const handleUpdateData = async () => {
         try {
             await fetchData();
-            window.location.reload();
         } catch (error) {
             console.error('Error updating chart data:', error.message);
         }

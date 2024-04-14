@@ -13,6 +13,16 @@ export const validateForm = (formData) => {
         errors.lastName = 'Last Name is required';
     }
 
+    // Gender
+    if (!formData.gender.trim()) {
+        errors.gender = 'Gender is required';
+    }
+
+    // Age
+    if (!formData.age.trim()) {
+        errors.age = 'Age is required';
+    }
+
     // Position
     if (!formData.position.trim()) {
         errors.position = 'Position is required';

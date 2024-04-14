@@ -4,7 +4,7 @@ import * as XLSX from 'xlsx';
 const ExcelDownload = ({ surveyData }) => {
   const downloadExcel = async () => {
     const excelData = [
-      ["Respondent", "Social Media", "Hours", "Streaming", "Communication", "Content", "Influenced", "Sharing Content", "Device"],
+      ["Respondent", "Social Media", "Hours", "Streaming", "Communication", "Content", "Influenced", "Sharing Content", "Device", "Impact", "Following"],
       ...surveyData.map((data) => [
         data.respondent,
         data.social_media,
@@ -15,6 +15,8 @@ const ExcelDownload = ({ surveyData }) => {
         data.influenced,
         data.sharing_content,
         data.device,
+        data.impact,
+        data.following,
       ]),
     ];
 
