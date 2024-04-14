@@ -27,7 +27,6 @@ function App() {
           <Route path="/survey-form" element={<SurveyForm />} />
           <Route path="/success" element={<SuccessPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="*" element={<WelcomePage />} />
         </Routes>
       </Router >
       

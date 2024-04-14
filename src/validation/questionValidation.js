@@ -86,12 +86,12 @@ export const validateQuestions = (formData) => {
 
     // QUESTION 9
     if (!formData.question9.trim()) {
-        errors.question9 = 'Please provide a response for Question 5.';
+        errors.question9 = 'Please provide a response for Question 9.';
     }
 
     // QUESTION 10
     if (!formData.question10.trim()) {
-        errors.question10 = 'Please provide a response for Question 5.';
+        errors.question10 = 'Please provide a response for Question 10.';
     }
 
     return errors;
