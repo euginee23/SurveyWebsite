@@ -25,7 +25,7 @@ const WelcomePage = () => {
                         <p style={{ textIndent: '30px' }}>Hello Crimson and Instructors! We hope you had a great day. Greetings from the BSCS Department! We invite you to participate in our survey, aiming to <span style={{ fontWeight: 'bold' }}>Identify the Most-Used Online Platform Digital Media at Western Mindanao State University Pagadian</span>.</p>
                         <p style={{ textIndent: '30px' }}>Your insights are invaluable to us as we strive to understand preferences and trends in the utilization of digital media on campus, significantly contributing to enhancing the overall digital experience for our university community.</p>
                         <p style={{ marginTop: '70px' }}>This survey should take approximately 5 minutes or less of your valuable time to complete.</p>
-                        <p>To begin the survey, click on <span style={{ fontWeight: 'bold' }}>"Continue to Survey"</span> button.</p>
+                        <p>To begin the survey, click on <span style={{ fontWeight: 'bold' }}>"Start Survey"</span> button.</p>
                     </div>
                 </div>
 
