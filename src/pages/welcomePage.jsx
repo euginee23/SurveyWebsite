@@ -28,13 +28,14 @@ const WelcomePage = () => {
                         <p>To begin the survey, click on <span style={{ fontWeight: 'bold' }}>"Continue to Survey"</span> button.</p>
                     </div>
                 </div>
+
                 <div className="d-flex justify-content-between">
                     <Link to="/survey-form" className="btn btn-success btn-lg mb-4 mt-1" disabled={loading} onClick={handleSurveyClick}>
-                    {loading ? 'Loading...' : 'Continue to Survey'}
+                    {loading ? 'Loading...' : 'Start Survey'}
                     </Link>
 
                     <Link to="/dashboard" className="btn btn-primary btn-lg mb-4 mt-1" disabled={loading} onClick={handleDashboardClick}>
-                    {loading ? 'Loading...' : 'Go to Dashboard'}
+                    {loading ? 'Loading...' : 'View Dashboard'}
                     </Link>
                 </div>
             </div>
