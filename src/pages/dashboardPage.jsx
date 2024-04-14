@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import apiUrl from '../../apiUrl';
 import { Chart as ChartJS, defaults } from "chart.js/auto";
 import { Bar, Doughnut, Line } from "react-chartjs-2";
@@ -17,9 +18,11 @@ const Dashboard = () => {
     const [mediaPlatformData, setMediaPlatformData] = useState([]);
     const [streamingPlatformData, setStreamingPlatformData] = useState([]);
     const [communicationPlatformData, setCommunicationPlatformData] = useState([]);
+    const [loading, setLoading] = useState(false); 
 
     const fetchData = async () => {
         try {
+            setLoading(true); 
             const positionResponse = await fetch(`${apiUrl}/api/getPositionChartData`);
             const positionData = await positionResponse.json();
             console.log('Position chart data updated:', positionData);
@@ -51,9 +54,10 @@ const Dashboard = () => {
             setSurveyData(surveyData);
 
             setSelectedData(mediaPlatformData);
-
+            setLoading(false); 
             notify('Chart data updated!');
         } catch (error) {
+            setLoading(false); 
             console.error('Error updating chart data:', error.message);
         }
     };
@@ -66,16 +70,36 @@ const Dashboard = () => {
                 setTotalResponses(data.totalResponses);
             } catch (error) {
                 console.error('Error fetching total responses:', error.message);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oh no',
+                    text: 'There was an error fetching total responses!',
+                });
             }
         };
-
+    
         if (initialLoad) {
             fetchData();
             setInitialLoad(false);
         }
-
+    
         fetchTotalResponses();
-    }, []);
+    }, [initialLoad]);
+
+    useEffect(() => {
+        if (initialLoad) {
+            Swal.fire({
+                title: 'Loading',
+                html: 'Please wait...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        } else {
+            Swal.close();
+        }
+    }, [initialLoad]);
 
     const notify = (message) => {
         toast.info(message);
@@ -158,7 +182,7 @@ const Dashboard = () => {
                             <div className="card-body">
                                 <h5>Actions</h5>
                                 <button className="btn btn-success btn-lg mb-1 mt-1" onClick={handleUpdateData}>
-                                    Refresh Data
+                                    {loading ? 'Loading...' : 'Refresh Data'} 
                                 </button>
                             </div>
                         </div>
@@ -254,7 +278,6 @@ const Dashboard = () => {
             </div>
         </div>
     );
-    
 };
 
 export default Dashboard;
