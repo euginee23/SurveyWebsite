@@ -87,7 +87,7 @@ const Dashboard = () => {
     }, [initialLoad]);
 
     useEffect(() => {
-        if (initialLoad) {
+        if (loading) {
             Swal.fire({
                 title: 'Loading',
                 html: 'Please wait...',
@@ -99,7 +99,7 @@ const Dashboard = () => {
         } else {
             Swal.close();
         }
-    }, [initialLoad]);
+    }, [loading]);
 
     const notify = (message) => {
         toast.info(message);
