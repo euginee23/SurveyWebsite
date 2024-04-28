@@ -5,6 +5,7 @@ const dbConfig = {
   user: 'uyvysyqkhvngead3',
   password: '6klYhnHRjvhm2W8bmX9l',
   database: 'blesfxrl4vbau3qf3rph',
+  port: '3306',
   connectionLimit: 10,
   waitForConnections: true, 
   queueLimit: 0, 
