@@ -182,12 +182,14 @@ app.get('/api/getTotalResponses', async (req, res) => {
   try {
     const connection = await db.getConnection();
     const [result] = await connection.query('SELECT COUNT(*) AS totalResponses FROM survey');
-
     const totalResponses = result[0].totalResponses;
+
+    const [lastDateResult] = await connection.query('SELECT MAX(created_at) AS lastDate FROM survey');
+    const lastDate = lastDateResult[0].lastDate;
 
     connection.release();
 
-    res.status(200).json({ totalResponses });
+    res.status(200).json({ totalResponses, lastDate });
   } catch (error) {
     console.error('Error fetching total responses:', error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -197,29 +199,50 @@ app.get('/api/getTotalResponses', async (req, res) => {
 // USER POSITION RETRIEVE
 app.get('/api/getPositionChartData', async (req, res) => {
   try {
-    const connection = await db.getConnection();
+      const connection = await db.getConnection();
+      const { minAge, maxAge, gender, position, course } = req.query;
 
-    const [instructorCount] = await connection.query('SELECT COUNT(*) as count FROM users WHERE position = "instructor"');
-    const [studentCount] = await connection.query('SELECT COUNT(*) as count FROM users WHERE position = "student"');
+      let whereClause = '';
+      let params = [];
 
-    const instructorData = {
-      label: 'instructor',
-      count: instructorCount[0].count,
-    };
+      if (minAge && maxAge) {
+          whereClause += ' WHERE age BETWEEN ? AND ?';
+          params.push(minAge, maxAge);
+      }
+      if (gender) {
+          if (whereClause) whereClause += ' AND';
+          else whereClause += ' WHERE';
+          whereClause += ' gender = ?';
+          params.push(gender);
+      }
+      if (position) {
+          if (whereClause) whereClause += ' AND';
+          else whereClause += ' WHERE';
+          whereClause += ' position = ?';
+          params.push(position);
+      }
+      if (position === 'student' && course) {
+          if (whereClause) whereClause += ' AND';
+          else whereClause += ' WHERE';
+          whereClause += ' course = ?';
+          params.push(course);
+      }
 
-    const studentData = {
-      label: 'student',
-      count: studentCount[0].count,
-    };
+      const query = `
+          SELECT position as label, COUNT(*) as count
+          FROM users
+          ${whereClause}
+          GROUP BY position
+      `;
 
-    const chartData = [instructorData, studentData];
+      const [respondents] = await connection.query(query, params);
 
-    connection.release();
+      connection.release();
 
-    res.status(200).json(chartData);
+      res.status(200).json(respondents);
   } catch (error) {
-    console.error('Error fetching position chart data:', error.message);
-    res.status(500).json({ error: 'Internal Server Error' });
+      console.error('Error fetching filtered respondents:', error.message);
+      res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -227,10 +250,85 @@ app.get('/api/getPositionChartData', async (req, res) => {
 app.get('/api/getMediaPlatformChartData', async (req, res) => {
   try {
     const connection = await db.getConnection();
+    const { minAge, maxAge, gender, position, course, hoursSpent, contentEngaged, influences, contentCreationFrequency, deviceUsed, mentalHealthImpact, followingCreators } = req.query;
 
-    const [mediaPlatformCounts] = await connection.query(
-      'SELECT question1_response as label, COUNT(*) as count FROM survey GROUP BY question1_response'
-    );
+    let whereClause = '';
+    let params = [];
+    if (minAge && maxAge) {
+      whereClause += ' WHERE age BETWEEN ? AND ?';
+      params.push(minAge, maxAge);
+    }
+    if (gender) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' gender = ?';
+      params.push(gender);
+    }
+    if (position) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' position = ?';
+      params.push(position);
+    }
+    if (position === 'student' && course) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' course = ?';
+      params.push(course);
+    }
+
+    if (hoursSpent) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' question2_response = ?';
+      params.push(hoursSpent);
+    }
+    if (contentEngaged) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' question5_response = ?';
+      params.push(contentEngaged);
+    }
+    if (influences) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' question6_response = ?';
+      params.push(influences);
+    }
+    if (contentCreationFrequency) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' question7_response = ?';
+      params.push(contentCreationFrequency);
+    }
+    if (deviceUsed) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' question8_response = ?';
+      params.push(deviceUsed);
+    }
+    if (mentalHealthImpact) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' question9_response = ?';
+      params.push(mentalHealthImpact);
+    }
+    if (followingCreators) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' question10_response = ?';
+      params.push(followingCreators);
+    }
+
+    const query = `
+      SELECT question1_response as label, COUNT(*) as count
+      FROM survey
+      LEFT JOIN users ON survey.user_id = users.user_id
+      ${whereClause}
+      GROUP BY question1_response
+    `;
+
+    const [mediaPlatformCounts] = await connection.query(query, params);
 
     connection.release();
 
@@ -245,10 +343,85 @@ app.get('/api/getMediaPlatformChartData', async (req, res) => {
 app.get('/api/getCommuncationPlatformChartData', async (req, res) => {
   try {
     const connection = await db.getConnection();
+    const { minAge, maxAge, gender, position, course, hoursSpent, contentEngaged, influences, contentCreationFrequency, deviceUsed, mentalHealthImpact, followingCreators } = req.query;
 
-    const [mediaPlatformCounts] = await connection.query(
-      'SELECT question4_response as label, COUNT(*) as count FROM survey GROUP BY question4_response'
-    );
+    let whereClause = '';
+    let params = [];
+    if (minAge && maxAge) {
+      whereClause += ' WHERE age BETWEEN ? AND ?';
+      params.push(minAge, maxAge);
+    }
+    if (gender) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' gender = ?';
+      params.push(gender);
+    }
+    if (position) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' position = ?';
+      params.push(position);
+    }
+    if (position === 'student' && course) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' course = ?';
+      params.push(course);
+    }
+
+    if (hoursSpent) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' question2_response = ?';
+      params.push(hoursSpent);
+    }
+    if (contentEngaged) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' question5_response = ?';
+      params.push(contentEngaged);
+    }
+    if (influences) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' question6_response = ?';
+      params.push(influences);
+    }
+    if (contentCreationFrequency) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' question7_response = ?';
+      params.push(contentCreationFrequency);
+    }
+    if (deviceUsed) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' question8_response = ?';
+      params.push(deviceUsed);
+    }
+    if (mentalHealthImpact) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' question9_response = ?';
+      params.push(mentalHealthImpact);
+    }
+    if (followingCreators) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' question10_response = ?';
+      params.push(followingCreators);
+    }
+
+    const query = `
+      SELECT question4_response as label, COUNT(*) as count
+      FROM survey
+      LEFT JOIN users ON survey.user_id = users.user_id
+      ${whereClause}
+      GROUP BY question4_response
+    `;
+
+    const [mediaPlatformCounts] = await connection.query(query, params);
 
     connection.release();
 
@@ -259,14 +432,90 @@ app.get('/api/getCommuncationPlatformChartData', async (req, res) => {
   }
 });
 
+
 // GET STREAMING PLATFORM
 app.get('/api/getStreamingPlatformChartData', async (req, res) => {
   try {
     const connection = await db.getConnection();
+    const { minAge, maxAge, gender, position, course, hoursSpent, contentEngaged, influences, contentCreationFrequency, deviceUsed, mentalHealthImpact, followingCreators } = req.query;
 
-    const [mediaPlatformCounts] = await connection.query(
-      'SELECT question3_response as label, COUNT(*) as count FROM survey GROUP BY question3_response'
-    );
+    let whereClause = '';
+    let params = [];
+    if (minAge && maxAge) {
+      whereClause += ' WHERE age BETWEEN ? AND ?';
+      params.push(minAge, maxAge);
+    }
+    if (gender) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' gender = ?';
+      params.push(gender);
+    }
+    if (position) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' position = ?';
+      params.push(position);
+    }
+    if (position === 'student' && course) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' course = ?';
+      params.push(course);
+    }
+
+    if (hoursSpent) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' question2_response = ?';
+      params.push(hoursSpent);
+    }
+    if (contentEngaged) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' question5_response = ?';
+      params.push(contentEngaged);
+    }
+    if (influences) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' question6_response = ?';
+      params.push(influences);
+    }
+    if (contentCreationFrequency) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' question7_response = ?';
+      params.push(contentCreationFrequency);
+    }
+    if (deviceUsed) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' question8_response = ?';
+      params.push(deviceUsed);
+    }
+    if (mentalHealthImpact) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' question9_response = ?';
+      params.push(mentalHealthImpact);
+    }
+    if (followingCreators) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' question10_response = ?';
+      params.push(followingCreators);
+    }
+
+    const query = `
+      SELECT question3_response as label, COUNT(*) as count
+      FROM survey
+      LEFT JOIN users ON survey.user_id = users.user_id
+      ${whereClause}
+      GROUP BY question3_response
+    `;
+
+    const [mediaPlatformCounts] = await connection.query(query, params);
 
     connection.release();
 
@@ -281,19 +530,38 @@ app.get('/api/getStreamingPlatformChartData', async (req, res) => {
 app.get('/api/getStudentCourseChartData', async (req, res) => {
   try {
     const connection = await db.getConnection();
+    const { minAge, maxAge, gender, course } = req.query;
 
-    const [studentCourseCounts] = await connection.query(
-      'SELECT course as label, COUNT(course) as count FROM users WHERE position = "student" GROUP BY course'
-    );
+    let whereClause = 'WHERE position = "student"';
+    let params = [];
+
+    if (minAge && maxAge) {
+      whereClause += ' AND age BETWEEN ? AND ?';
+      params.push(minAge, maxAge);
+    }
+    if (gender) {
+      whereClause += ' AND gender = ?';
+      params.push(gender);
+    }
+
+    const query = `
+      SELECT course as label, COUNT(course) as count 
+      FROM users 
+      ${whereClause} 
+      GROUP BY course
+    `;
+
+    const [studentCourseCounts] = await connection.query(query, params);
 
     connection.release();
 
     res.status(200).json(studentCourseCounts);
   } catch (error) {
-    console.error('Error fetching student course chart data:', error.message);
+    console.error('Error fetching filtered student course chart data:', error.message);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
 // GET SURVEY DATA
 app.get('/api/getSurveyData', async (req, res) => {
