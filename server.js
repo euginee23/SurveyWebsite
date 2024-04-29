@@ -199,50 +199,50 @@ app.get('/api/getTotalResponses', async (req, res) => {
 // USER POSITION RETRIEVE
 app.get('/api/getPositionChartData', async (req, res) => {
   try {
-      const connection = await db.getConnection();
-      const { minAge, maxAge, gender, position, course } = req.query;
+    const connection = await db.getConnection();
+    const { minAge, maxAge, gender, position, course } = req.query;
 
-      let whereClause = '';
-      let params = [];
+    let whereClause = '';
+    let params = [];
 
-      if (minAge && maxAge) {
-          whereClause += ' WHERE age BETWEEN ? AND ?';
-          params.push(minAge, maxAge);
-      }
-      if (gender) {
-          if (whereClause) whereClause += ' AND';
-          else whereClause += ' WHERE';
-          whereClause += ' gender = ?';
-          params.push(gender);
-      }
-      if (position) {
-          if (whereClause) whereClause += ' AND';
-          else whereClause += ' WHERE';
-          whereClause += ' position = ?';
-          params.push(position);
-      }
-      if (position === 'student' && course) {
-          if (whereClause) whereClause += ' AND';
-          else whereClause += ' WHERE';
-          whereClause += ' course = ?';
-          params.push(course);
-      }
+    if (minAge && maxAge) {
+      whereClause += ' WHERE age BETWEEN ? AND ?';
+      params.push(minAge, maxAge);
+    }
+    if (gender) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' gender = ?';
+      params.push(gender);
+    }
+    if (position) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' position = ?';
+      params.push(position);
+    }
+    if (position === 'student' && course) {
+      if (whereClause) whereClause += ' AND';
+      else whereClause += ' WHERE';
+      whereClause += ' course = ?';
+      params.push(course);
+    }
 
-      const query = `
+    const query = `
           SELECT position as label, COUNT(*) as count
           FROM users
           ${whereClause}
           GROUP BY position
       `;
 
-      const [respondents] = await connection.query(query, params);
+    const [respondents] = await connection.query(query, params);
 
-      connection.release();
+    connection.release();
 
-      res.status(200).json(respondents);
+    res.status(200).json(respondents);
   } catch (error) {
-      console.error('Error fetching filtered respondents:', error.message);
-      res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error fetching filtered respondents:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -569,19 +569,30 @@ app.get('/api/getSurveyData', async (req, res) => {
     const connection = await db.getConnection();
 
     const [surveyData] = await connection.query(`
-      SELECT ROW_NUMBER() OVER (ORDER BY user_id) as respondent,
-             question1_response as social_media,
-             question2_response as hours,
-             question3_response as streaming,
-             question4_response as communication,
-             question5_response as content,
-             question6_response as influenced,
-             question7_response as sharing_content,
-             question8_response as device,
-             question9_response as impact,
-             question10_response as following
-      FROM survey
-    `);
+    SELECT 
+      ROW_NUMBER() OVER (ORDER BY s.user_id) as respondent,
+      u.firstName as firstName_data,
+      u.lastName as lastName_data,
+      u.gender as gender_data,
+      u.age as age_data,
+      u.position as position_data,
+      u.course as course_data,
+      u.email as email_data,
+      s.question1_response as social_media,
+      s.question2_response as hours,
+      s.question3_response as streaming,
+      s.question4_response as communication,
+      s.question5_response as content,
+      s.question6_response as influenced,
+      s.question7_response as sharing_content,
+      s.question8_response as device,
+      s.question9_response as impact,
+      s.question10_response as following
+    FROM 
+      survey s
+    INNER JOIN 
+      users u ON s.user_id = u.user_id
+  `);
 
     connection.release();
 
